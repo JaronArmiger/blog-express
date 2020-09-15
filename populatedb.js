@@ -16,6 +16,18 @@ mongoose.Promise = global.Promise;
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error'));
 
+User.remove({}, function(err) { 
+   console.log('User collection removed') 
+});
+
+Post.remove({}, function(err) { 
+   console.log('Post collection removed') 
+});
+
+Comment.remove({}, function(err) { 
+   console.log('Comment collection removed') 
+});
+
 const users = [];
 const posts = [];
 const comments = [];
@@ -41,7 +53,7 @@ const userCreate = (username, password, cb) => {
 };
 
 const postCreate = (title, content, author, cb) => {
-  const post = new Post ({
+  const post = new Post({
   	title,
   	content,
   	author,
@@ -55,6 +67,25 @@ const postCreate = (title, content, author, cb) => {
     console.log('New Post: ' + post);
     posts.push(post);
     cb(null, post);
+    return;
+  });
+};
+
+const commentCreate = (content, post, author, cb) => {
+  const comment = new Comment({
+  	content,
+  	post,
+  	author,
+  });
+
+  comment.save((err) => {
+    if (err) {
+      cb(err, null);
+      return;
+    }
+    console.log('New Comment: ' + comment);
+    comments.push(comment);
+    cb(null, comment);
     return;
   });
 };
@@ -87,9 +118,27 @@ const createPosts = (cb) => {
   ], cb);
 };
 
+const createComments = (cb) => {
+  async.series([
+    function(callback) {
+      commentCreate('wow that grape soda really HITS DIFFERENT', posts[0], users[0], callback);
+    },
+    function(callback) {
+      commentCreate('all i do is think about you', posts[0], users[1], callback);
+    },
+    function(callback) {
+      commentCreate('the chosen one :O', posts[1], users[0], callback);
+    },
+    function(callback) {
+      commentCreate('remind me later', posts[1], users[1], callback);
+    }
+  ], cb);
+};
+
 async.series([
   createUsers,
   createPosts,
+  createComments,
 ], function(err, results) {
 	 if (err) {
 	 	console.log('FINAL ERR: ' + err);
