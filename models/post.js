@@ -19,7 +19,13 @@ const PostSchema = new Schema(
 PostSchema
   .virtual('created_at_formatted')
   .get(() => {
-  	return this.created
+  	return this.created_at ? moment(this.created_at).format('MMM Do, YYYY') : 'unknown'
+  });
+
+PostSchema
+  .virtual('created_at_formatted')
+  .get(() => {
+    return this.published_at ? moment(this.published_at).format('MMM Do, YYYY') : 'unknown'
   });
 
 module.exports = mongoose.model('Post', PostSchema);
