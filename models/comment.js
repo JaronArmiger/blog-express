@@ -11,3 +11,11 @@ const CommentSchema = new Schema(
     author: { type: Schema.Types.ObjectId, ref: 'User', require: true },
   }
 );
+
+CommentSchema
+  .virtual('created_at_formatted')
+  .get(() => {
+  	return this.created_at ? moment(this.created_at).format('MMM Do, YYYY') : 'unknown'
+  });
+
+module.exports = mongoose.model('Comment', CommentSchema);
