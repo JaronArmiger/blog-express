@@ -40,8 +40,23 @@ const userCreate = (username, password, cb) => {
   });
 };
 
-const postCreate = () => {
+const postCreate = (title, content, author, cb) => {
+  const post = new Post ({
+  	title,
+  	content,
+  	author,
+  });
 
+  post.save((err) => {
+    if (err) {
+      cb(err, null);
+      return;
+    }
+    console.log('New Post: ' + post);
+    posts.push(post);
+    cb(null, post);
+    return;
+  });
 };
 
 const createUsers = (cb) => {
@@ -55,8 +70,26 @@ const createUsers = (cb) => {
   ], cb);
 };
 
+const createPosts = (cb) => {
+  async.series([
+    function(callback) {
+      postCreate('field trip', 'oh shit there\'s a field trip today', users[0], callback);
+    },
+    function(callback) {
+      postCreate('tomatoes', 'i love tomatoes', users[0], callback);
+    },
+    function(callback) {
+      postCreate('grape soda', 'where can I get some grape soda', users[1], callback);
+    },
+    function(callback) {
+      postCreate('table cloth', 'table cloths?', users[1], callback);
+    },
+  ], cb);
+};
+
 async.series([
   createUsers,
+  createPosts,
 ], function(err, results) {
 	 if (err) {
 	 	console.log('FINAL ERR: ' + err);
