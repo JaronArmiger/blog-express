@@ -1,6 +1,7 @@
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
-const passwordMethods = require('./helpers/password.js');
+const passwordMethods = require('./lib/utils.js');
+const User = require('./models/user');
 
 passport.use(new LocalStrategy((username, password, cb) => {
   User.findOne({ username: username }, (err, user) => {

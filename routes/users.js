@@ -1,9 +1,27 @@
-var express = require('express');
-var router = express.Router();
+const router = require('express').Router();
+const User = require('../models/user');
+const utils = require('../lib/utils');
 
-/* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
+router.post('/login', (req, res, next) => {
+  
+});
+
+router.post('/register', (req, res, next) => {
+  const saltHash = utils.genPassword(req.body.password);
+  const salt = saltHash.salt;
+  const hash = saltHash.hash;
+
+  const newUser = new User({
+  	username: req.body.username,
+  	hash,
+  	salt,
+  });
+
+  newUser.save()
+    .then((user) => {
+    	res.json({ success: true, user,});
+    })
+    .catch(err => next(err));
 });
 
 module.exports = router;

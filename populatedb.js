@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-const passwordMethods = require('./helpers/password.js');
+const passwordMethods = require('./lib/utils.js');
 
 console.log('populating db :O');
 
