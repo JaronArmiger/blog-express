@@ -1,6 +1,12 @@
 const router = require('express').Router();
 const User = require('../models/user');
+const passport = require('passport');
 const utils = require('../lib/utils');
+
+router.get('/protected', passport.authenticate('jwt', { session: false }),
+	(req, res, next) => {
+	  res.status(200).json({ success: true, msg: 'you are successfully authenticated ayy' });
+	});
 
 router.post('/login', (req, res, next) => {
   User.findOne({ username: req.body.username })

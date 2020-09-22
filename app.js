@@ -1,5 +1,8 @@
 require('dotenv').config();
 
+const cors = require('cors');
+const passport = require('passport');
+
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
@@ -14,11 +17,19 @@ mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true });
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
+// must first load the models
+require('./models/user');
+// pass the global passport object into the configuration function
+require('./config/passport')(passport);
+// this will initialize the passport object on every request
+
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+const postsRouter = require('./routes/posts');
 
 var app = express();
+app.use(passport.initialize());
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -35,9 +46,12 @@ app.use(sassMiddleware({
   sourceMap: true
 }));
 app.use(express.static(path.join(__dirname, 'public')));
+// allows front end app to make HTTP requests to Express app
+app.use(cors());
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/posts', postsRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
