@@ -5,7 +5,11 @@ const utils = require('../lib/utils');
 
 router.get('/protected', passport.authenticate('jwt', { session: false }),
 	(req, res, next) => {
-	  res.status(200).json({ success: true, msg: 'you are successfully authenticated ayy' });
+	  res.status(200).json({ 
+	  	success: true, 
+	  	msg: 'you are successfully authenticated ayy',
+	  	user: req.user
+	  });
 	});
 
 router.post('/login', (req, res, next) => {
