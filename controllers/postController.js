@@ -68,11 +68,11 @@ exports.post_create = [
 
 
 exports.post_update = [
+  passport.authenticate('jwt', { session: false }),
   validator.body('title', 'Title length 1-90 Characters').isLength({ min: 1, max: 90 }),
   validator.body('content', 'Post must have content').trim().isLength({ min: 1 }),
   validator.sanitizeBody('title').escape(),
   validator.sanitizeBody('content').escape(),
-  passport.authenticate('jwt', { session: false }),
   (req, res, next) => {
     const errors = validator.validationResult(req);
     Post.findById(req.params.id)
@@ -96,6 +96,12 @@ exports.post_update = [
   }
 ]
 
-exports.post_delete = (req, res, next) => {
-  
-}
+exports.post_delete = [
+  passport.authenticate('jwt', { session: false }),
+  (req, res, next) => {
+    Post.findByIdAndRemove(req.params.id, (err) => {
+      if (err) return next(err);
+      res.send({ msg: `Post ${req.params.id} deleted` });
+    })
+  }
+]
