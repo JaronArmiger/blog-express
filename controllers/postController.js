@@ -39,19 +39,12 @@ exports.post_detail = (req, res, next) => {
   });
 };
 
-exports.post_create_get = [
+exports.post_create = [
   passport.authenticate('jwt', { session: false }),
-  (req, res, next) => {
-    res.send(req.user);
-  }
-]
-
-exports.post_create_post = [
   validator.body('title', 'Title length 1-90 Characters').isLength({ min: 1, max: 90 }),
   validator.body('content', 'Post must have content').trim().isLength({ min: 1 }),
   validator.sanitizeBody('title').escape(),
   validator.sanitizeBody('content').escape(),
-  passport.authenticate('jwt', { session: false }),
   (req, res, next) => {
     const errors = validator.validationResult(req);
     const post = new Post({
@@ -73,13 +66,35 @@ exports.post_create_post = [
   }
 ]
 
-exports.post_update_get = (req, res, next) => {
-  
-}
 
-exports.post_update_post = (req, res, next) => {
-  
-}
+exports.post_update = [
+  validator.body('title', 'Title length 1-90 Characters').isLength({ min: 1, max: 90 }),
+  validator.body('content', 'Post must have content').trim().isLength({ min: 1 }),
+  validator.sanitizeBody('title').escape(),
+  validator.sanitizeBody('content').escape(),
+  passport.authenticate('jwt', { session: false }),
+  (req, res, next) => {
+    const errors = validator.validationResult(req);
+    Post.findById(req.params.id)
+    .populate('author')
+    .exec((err, post) => {
+      if (err) return next(err);
+      if (!errors.isEmpty()) {
+        res.send({ 
+      	  msg: 'Errors have occurred :(', 
+      	  errors: errors.Array(),
+        });
+      }
+      post.title = req.body.title;
+      post.content = req.body.content;
+      post.save((err) => {
+      	if (err) return next(err);
+      	res.send(post);
+      })
+    });
+    
+  }
+]
 
 exports.post_delete = (req, res, next) => {
   
