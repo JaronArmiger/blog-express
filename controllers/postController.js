@@ -99,6 +99,19 @@ exports.post_update = [
 exports.post_delete = [
   passport.authenticate('jwt', { session: false }),
   (req, res, next) => {
+    Post.findById(req.params.postId)
+      .exec((err, post) => {
+        if (err) return next(err);
+        if (post == null) {
+          const err = new Error('Post not found');
+          err.status = 404;
+          return next(err);
+        }
+        if (req.user._id.toString() != post.author.toString()) {
+          res.send({ msg: 'You aren\'t authorized to delete this post' });
+          return;
+        }
+      }) 
     Post.findByIdAndRemove(req.params.postId, (err) => {
       if (err) return next(err);
       res.send({ msg: `Post ${req.params.postId} deleted` });

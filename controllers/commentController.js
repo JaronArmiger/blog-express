@@ -93,7 +93,7 @@ exports.comment_delete = [
       	  return next(err);
       	}
       	if (req.user._id.toString() != comment.author.toString()) {
-          res.send({ msg: 'You aren\'t authorized to delete this post' });
+          res.send({ msg: 'You aren\'t authorized to delete this comment' });
           return;
         }
   	  }) 
