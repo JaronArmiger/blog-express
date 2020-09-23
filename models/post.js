@@ -10,8 +10,7 @@ const PostSchema = new Schema(
   	created_at: { type: Date, default: Date.now() },
   	published: { type: Boolean, default: false },
   	// add when post is published
-  	// with PostSchema.add({ })
-  	//published_at: { type: Date },
+  	published_at: { type: Date, default: null },
   	author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   }
 );

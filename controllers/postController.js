@@ -105,3 +105,35 @@ exports.post_delete = [
     })
   }
 ]
+
+exports.post_publish = [
+  passport.authenticate('jwt', { session: false }),
+  (req, res, next) => {
+  	Post.findById(req.params.id)
+  	  .exec((err, post) => {
+  	  	if (err) return next(err);
+  	  	post.published = true;
+  	  	post.published_at = Date.now();
+  	  	post.save((err) => {
+  	  	  if (err) return next(err);
+  	  	  res.send(post);
+  	  	});
+  	  })
+  }
+]
+
+exports.post_unpublish = [
+  passport.authenticate('jwt', { session: false }),
+  (req, res, next) => {
+  	Post.findById(req.params.id)
+  	  .exec((err, post) => {
+  	  	if (err) return next(err);
+  	  	post.published = false;
+  	  	post.published_at = null;
+  	  	post.save((err) => {
+  	  	  if (err) return next(err);
+  	  	  res.send(post);
+  	  	});
+  	  })
+  }
+]
