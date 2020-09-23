@@ -1,14 +1,8 @@
 const router = require('express').Router();
+const commentController = require('../controllers/commentController');
 
-router.get('/', (req, res, next) => {
-  
-});
-
-router.get('/:commentId', (req, res, next) => {
-  res.send({ 
-  	postId: req.postId,
-  	commentId: req.params.commentId,
-  })
-});
+router.get('/', commentController.comment_list);
+router.post('/create', commentController.comment_create);
+router.get('/:commentId', commentController.comment_detail);
 
 module.exports = router;
