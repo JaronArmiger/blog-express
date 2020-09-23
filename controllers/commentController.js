@@ -80,3 +80,26 @@ exports.comment_update = [
       });
   }
 ]
+
+exports.comment_delete = [
+  passport.authenticate('jwt', { session: false }),
+  (req, res, next) => {
+  	Comment.findById(req.params.commentId)
+  	  .exec((err, comment) => {
+  	  	if (err) return next(err);
+  	  	if (comment == null) {
+      	  const err = new Error('Comment not found');
+      	  err.status = 404;
+      	  return next(err);
+      	}
+      	if (req.user._id.toString() != comment.author.toString()) {
+          res.send({ msg: 'You aren\'t authorized to delete this post' });
+          return;
+        }
+  	  }) 
+    Comment.findByIdAndRemove(req.params.commentId, (err) => {
+      if (err) return next(err);
+      res.send({ msg: `Comment ${req.params.commentId} deleted` });
+    })
+  }
+]
