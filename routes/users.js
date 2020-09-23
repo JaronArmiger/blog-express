@@ -17,6 +17,7 @@ router.post('/login', (req, res, next) => {
     .then((user) => {
       if (!user) {
       	res.status(401).json({ success: false, msg: 'could not find user' });
+        return;
       }
       const isValid = utils.validPassword(req.body.password, user.hash, user.salt);
       if (isValid) {
@@ -24,8 +25,10 @@ router.post('/login', (req, res, next) => {
       	res.status(200).json({ 
       		success: true, token: tokenObject.token, 
       		expiresIn: tokenObject.expires });
+        return;
       } else {
       	res.status(401).json({ success: false, msg: 'incorrect password' });
+        return;
       }
     })
     .catch((err) => {

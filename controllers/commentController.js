@@ -26,6 +26,27 @@ exports.comment_detail = (req, res, next) => {
     });
 }
 
-exports.comment_create = (req, res, next) => {
-  
-}
+exports.comment_create = [
+  passport.authenticate('jwt', { session: false }),
+  validator.body('content', 'Max length 140 chars').isLength({ max: 140 }),
+  validator.sanitizeBody('content').escape(),
+  (req, res, next) => {
+  	const errors = validator.validationResult(req);
+  	const comment = new Comment({
+      content: req.body.content,
+      post: req.postId,
+      author: req.user._id,
+  	});
+  	if (!errors.isEmpty()) {
+  	  res.send({
+  	  	msg: 'Errors have occurred :\'(',
+        errors: errors.Array(),
+  	  });
+  	} else {
+  	  comment.save((err) => {
+  	  	if (err) return next(err);
+  	  	res.send(comment);
+  	  });
+  	}
+  }
+]
