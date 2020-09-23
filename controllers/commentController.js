@@ -50,3 +50,33 @@ exports.comment_create = [
   	}
   }
 ]
+
+exports.comment_update = [
+  passport.authenticate('jwt', { session: false }),
+  validator.body('content', 'Max length 140 chars').isLength({ max: 140 }),
+  validator.sanitizeBody('content').escape(),
+  (req, res, next) => {
+    const errors = validator.validationResult(req);
+    if (!errors.isEmpty()) {
+      res.send({
+  	  	msg: 'Errors have occurred :\'(',
+        errors: errors.Array(),
+  	  });
+  	  return;
+    }
+    Comment.findById(req.params.commentId)
+      .exec((err, comment) => {
+      	if (err) return next(err);
+      	if (comment == null) {
+      	  const err = new Error (`Comment ${req.params.commentId} not found`);
+      	  err.status = 404;
+      	  return next(err);
+      	}
+      	comment.content = req.body.content;
+      	comment.save((err) => {
+      	  if (err) return next(err);
+      	  res.send(comment);
+      	});
+      });
+  }
+]
