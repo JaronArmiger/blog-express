@@ -2,6 +2,7 @@ const router = require('express').Router();
 const passport = require('passport');
 
 const postController = require('../controllers/postController');
+const commentsRouter = require('./comments');
 
 router.get('/protected', passport.authenticate('jwt', { session: false }),
 	(req, res, next) => {
@@ -10,10 +11,17 @@ router.get('/protected', passport.authenticate('jwt', { session: false }),
 
 router.get('/', postController.post_list);
 router.post('/create', postController.post_create);
-router.post('/:id/update', postController.post_update);
-router.post('/:id/delete', postController.post_delete);
-router.post('/:id/publish', postController.post_publish);
-router.post('/:id/unpublish', postController.post_unpublish);
-router.get('/:id', postController.post_detail);
+router.post('/:postId/update', postController.post_update);
+router.post('/:postId/delete', postController.post_delete);
+router.post('/:postId/publish', postController.post_publish);
+router.post('/:postId/unpublish', postController.post_unpublish);
+router.get('/:postId', postController.post_detail);
+
+router.use('/:postId/comments', 
+	(req, res, next) => {
+	  req.postId = req.params.postId;
+	  next();
+	},
+	commentsRouter);
 
 module.exports = router;

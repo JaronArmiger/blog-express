@@ -17,12 +17,12 @@ exports.post_list = (req, res, next) => {
 exports.post_detail = (req, res, next) => {
   async.parallel({
   	post: (callback) => {
-  	  Post.findById(req.params.id)
+  	  Post.findById(req.params.postId)
   	    .populate('author')
   	    .exec(callback);
   	},
   	post_comments: (callback) => {
-  	  Comment.find({ 'post': req.params.id })
+  	  Comment.find({ 'post': req.params.postId })
   	    .exec(callback);
   	}
 
@@ -75,7 +75,7 @@ exports.post_update = [
   validator.sanitizeBody('content').escape(),
   (req, res, next) => {
     const errors = validator.validationResult(req);
-    Post.findById(req.params.id)
+    Post.findById(req.params.postId)
     .populate('author')
     .exec((err, post) => {
       if (err) return next(err);
@@ -99,9 +99,9 @@ exports.post_update = [
 exports.post_delete = [
   passport.authenticate('jwt', { session: false }),
   (req, res, next) => {
-    Post.findByIdAndRemove(req.params.id, (err) => {
+    Post.findByIdAndRemove(req.params.postId, (err) => {
       if (err) return next(err);
-      res.send({ msg: `Post ${req.params.id} deleted` });
+      res.send({ msg: `Post ${req.params.postId} deleted` });
     })
   }
 ]
@@ -109,7 +109,7 @@ exports.post_delete = [
 exports.post_publish = [
   passport.authenticate('jwt', { session: false }),
   (req, res, next) => {
-  	Post.findById(req.params.id)
+  	Post.findById(req.params.postId)
   	  .exec((err, post) => {
   	  	if (err) return next(err);
   	  	post.published = true;
@@ -125,7 +125,7 @@ exports.post_publish = [
 exports.post_unpublish = [
   passport.authenticate('jwt', { session: false }),
   (req, res, next) => {
-  	Post.findById(req.params.id)
+  	Post.findById(req.params.postId)
   	  .exec((err, post) => {
   	  	if (err) return next(err);
   	  	post.published = false;
